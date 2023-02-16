@@ -41,6 +41,6 @@ while [ -z "$(docker exec $CONTAINER_ID psql -U postgres -c "SELECT 1;" 2>/dev/n
 done
 
 docker cp tmp/demo-small-20170815.sql $CONTAINER_ID:/tmp/demo-small.sql
-docker exec $CONTAINER_ID psql -U postgres -d practice1 -f /tmp/demo-small.sql
+docker exec $CONTAINER_ID psql -U postgres -f /tmp/demo-small.sql
 
 rm -rf tmp
