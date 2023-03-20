@@ -9,7 +9,7 @@ get_container_id
 if [ -z "$CONTAINER_ID" ]; then
     echo "No container found with name 'dsp-postgres'"
     echo "Starting container..."
-    docker compose up -d
+    docker compose up -d --force-recreate
     get_container_id
     if [ -z "$CONTAINER_ID" ]; then
         echo "Failed to start container"
