@@ -1,3 +1,5 @@
+CREATE DATABASE practice2;
+
 -- Создадим таблицы аккаунтов и транзацкий
 CREATE TABLE accounts (
     id serial PRIMARY KEY,

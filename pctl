@@ -1,0 +1,63 @@
+#!/bin/bash
+
+_get_container_id() {
+    CONTAINER_ID=$(docker ps -f name=dsp-postgres -q)
+}
+
+_up_container() {
+    _get_container_id
+
+    if [ -z "$CONTAINER_ID" ]; then
+        echo "No container found with name 'dsp-postgres'"
+        echo "Starting container..."
+        docker compose up -d --force-recreate
+        _get_container_id
+        if [ -z "$CONTAINER_ID" ]; then
+            echo "Failed to start container"
+            exit 1
+        fi
+
+    fi
+
+    # wait for container to start
+    while [ -z "$(docker exec $CONTAINER_ID psql -U postgres -c "SELECT 1;" 2>/dev/null)" ]; do
+        sleep 1
+    done
+}
+
+_cleanup() {
+    SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+    sudo rm -rf $SCRIPT_DIR/data
+    docker compose down -v
+    _up_container
+}
+
+_usage() {
+    echo "Use: 'pctl init|cleanup|shell'"
+}
+
+_shell() {
+    docker exec -it $CONTAINER_ID psql -U postgres
+}
+
+if [[ $# < 1 ]]; then
+    _usage
+    exit 1
+fi;
+
+case $1 in
+    init)
+        _up_container
+        ;;
+    cleanup)
+        _up_container
+        _cleanup
+        ;;
+    shell)
+        _up_container
+        _shell
+        ;;
+    *)
+        _usage
+        ;;
+esac
